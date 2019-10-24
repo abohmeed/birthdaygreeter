@@ -1,0 +1,6 @@
+[[constraint]]
+  name = "github.com/gorilla/mux"
+  source = "github.com/gorilla/mux"
+[[constraint]]
+  name =  "github.com/gomodule/redigo"
+  source = "github.com/gomodule/redigo"
