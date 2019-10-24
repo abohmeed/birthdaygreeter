@@ -1,2 +1,3 @@
 src/github.com/gomodule
 src/github.com/gorilla
+pkg/*
