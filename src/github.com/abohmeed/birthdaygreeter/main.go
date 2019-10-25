@@ -41,6 +41,7 @@ func setEnv() {
 
 func newServer() http.Handler {
 	r := mux.NewRouter().StrictSlash(true)
+	r.Use(commonMiddleware)
 	r.HandleFunc("/healthcheck", healthCheck).Methods("GET")
 	r.HandleFunc("/hello/{username}", handleUpdateBirthdate).Methods("PUT")
 	r.HandleFunc("/hello/{username}", handleQueryBirthdate).Methods("GET")
@@ -197,4 +198,11 @@ func getTimeTillBirthdate(t string) int16 {
 	bdate = time.Date(cdate.Year(), bdate.Month(), bdate.Day(), 0, 0, 0, 0, time.UTC)
 	diff := bdate.Sub(cdate).Hours()
 	return int16(diff / float64(24))
+}
+
+func commonMiddleware(next http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        w.Header().Add("Content-Type", "application/json")
+        next.ServeHTTP(w, r)
+    })
 }
