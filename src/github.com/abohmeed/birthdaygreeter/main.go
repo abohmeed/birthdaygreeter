@@ -14,7 +14,8 @@ import (
 
 var isHealthy bool = true
 
-var redisHost string
+var redisHostWrite string
+var redisHostRead string
 var redisPort string
 var redisPassword string
 
@@ -26,8 +27,11 @@ type PostData struct {
 }
 
 func setEnv() {
-	if redisHost = os.Getenv("REDIS_HOST"); redisHost == "" {
-		redisHost = "localhost"
+	if redisHostWrite = os.Getenv("REDIS_MASTER_HOST"); redisHostWrite == "" {
+		redisHostWrite = "localhost"
+	}
+	if redisHostWrite = os.Getenv("REDIS_SLAVE_HOST"); redisHostRead == "" {
+		redisHostRead = "localhost"
 	}
 	if redisPort = os.Getenv("REDIS_PORT"); redisPort == "" {
 		redisPort = "6379"
@@ -46,7 +50,7 @@ func newServer() http.Handler {
 func main() {
 	setEnv()
 	// Just checking that Redis is reachable
-	pool := newPool()
+	pool := newPool(true)
 	conn := pool.Get()
 	defer conn.Close()
 	ping(conn)
@@ -74,7 +78,7 @@ func handleUpdateBirthdate(w http.ResponseWriter, r *http.Request) {
 		// fmt.Println(t)
 		vars := mux.Vars(r)
 		username := vars["username"]
-		pool := newPool()
+		pool := newPool(true)
 		conn := pool.Get()
 		defer conn.Close()
 		// We don't need the time part of the birthdate so let's remove it
@@ -89,7 +93,7 @@ func handleUpdateBirthdate(w http.ResponseWriter, r *http.Request) {
 func handleQueryBirthdate(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	username := vars["username"]
-	pool := newPool()
+	pool := newPool(false)
 	conn := pool.Get()
 	defer conn.Close()
 	if bd, err := get(conn, username); err != nil {
@@ -120,9 +124,15 @@ func respondWithError(w http.ResponseWriter, msg string, status int) {
 	json.NewEncoder(w).Encode(map[string]string{"message": msg})
 }
 
-func newPool() *redis.Pool {
+func newPool(write bool) *redis.Pool {
 	// We need to set the Redis connection settings for testing functions individually (not passing through main() function)
 	setEnv()
+	var redisHost string
+	if write {
+		redisHost = redisHostWrite
+	} else {
+		redisHost = redisHostRead
+	}
 	return &redis.Pool{
 		// Maximum number of idle connections in the pool.
 		MaxIdle: 80,
