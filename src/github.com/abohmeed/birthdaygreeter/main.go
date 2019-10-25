@@ -12,7 +12,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var isHealthy bool = true
+var isHealthy = false
 
 var redisHostWrite string
 var redisHostRead string
@@ -121,14 +121,7 @@ func healthCheck() {
 
 func handleHealthCheck(w http.ResponseWriter, r *http.Request) {
 	// Let's check that the app is health every 10 seconds
-	//Start a timer in a goroutine that will check the health of the app every 10 seconds
-	ticker := time.NewTicker(time.Second)
-	timer := time.NewTimer(time.Second * 10)
-	go func(timer *time.Timer, ticker *time.Ticker) {
-		for range timer.C {
-			healthCheck()
-		}
-	}(timer, ticker)
+	healthCheck()
 	if isHealthy {
 		json.NewEncoder(w).Encode(map[string]string{"status": "healthy"})
 	} else {
