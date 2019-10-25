@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"log"
 	"os"
 
@@ -9,14 +8,19 @@ import (
 )
 
 func main() {
-	hostPtr := flag.String("h", "127.0.0.1", "")
-	portPtr := flag.String("p", "6379", "")
-	flag.Parse()
-	pool := newPool(*hostPtr, *portPtr)
+	host := os.Getenv("REDIS_MASTER_HOST")
+	port := os.Getenv("REDIS_PORT")
+	if host == "" {
+		host = "127.0.0.1"
+	}
+	if port == "" {
+		port = "6379"
+	}
+	pool := newPool(host, port)
 	conn := pool.Get()
 	defer conn.Close()
 	if err := ping(conn); err != nil {
-		log.Println("Got", *hostPtr, *portPtr)
+		log.Println(err)
 		os.Exit(1)
 	} else {
 		os.Exit(0)

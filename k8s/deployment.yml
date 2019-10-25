@@ -40,3 +40,13 @@ spec:
         envFrom:
         - configMapRef:
             name: appconfig
+        livenessProbe:
+          httpGet:
+            path: /hello/user
+            port: 3000
+        readinessProbe:
+          exec:
+            command:
+            - /app/redis-check
+          initialDelaySeconds: 5
+          periodSeconds: 5
