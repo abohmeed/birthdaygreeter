@@ -2,24 +2,15 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"os"
 
 	"github.com/gomodule/redigo/redis"
 )
 
 func main() {
-	hostPtr := flag.String("h", "127.0.0.1", "[Required] The `Redis Host`")
-	portPtr := flag.String("p", "6379", "[Required] The `port` ")
+	hostPtr := flag.String("h", "127.0.0.1", "")
+	portPtr := flag.String("p", "6379", "")
 	flag.Parse()
-	flag.Usage = func() {
-		fmt.Printf("Usage: redis-check -h host  -p port")
-		flag.PrintDefaults()
-	}
-	if *hostPtr == "" || *portPtr == "" {
-		flag.Usage()
-		os.Exit(1)
-	}
 	pool := newPool(*hostPtr, *portPtr)
 	conn := pool.Get()
 	defer conn.Close()

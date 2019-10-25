@@ -42,7 +42,6 @@ func setEnv() {
 func newServer() http.Handler {
 	r := mux.NewRouter().StrictSlash(true)
 	r.Use(commonMiddleware)
-	r.HandleFunc("/healthcheck", handleHealthCheck).Methods("GET")
 	r.HandleFunc("/hello/{username}", handleUpdateBirthdate).Methods("PUT")
 	r.HandleFunc("/hello/{username}", handleQueryBirthdate).Methods("GET")
 	return r
@@ -50,7 +49,6 @@ func newServer() http.Handler {
 
 func main() {
 	setEnv()
-	healthCheck()
 	var router = newServer()
 	log.Println("Server starting on port 3000")
 	log.Fatal("Application is running", http.ListenAndServe(":3000", router))
@@ -109,32 +107,6 @@ func handleQueryBirthdate(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func healthCheck() {
-	//Start a timer in a goroutine that will update the health information every ten seconds
-	ticker := time.NewTicker(time.Second)
-	timer := time.NewTimer(time.Second * 10)
-	go func(timer *time.Timer, ticker *time.Ticker) {
-		for range timer.C {
-			pool := newPool(true)
-			conn := pool.Get()
-			defer conn.Close()
-			if err := ping(conn); err != nil {
-				isHealthy = false
-			} else {
-				isHealthy = true
-			}
-		}
-	}(timer, ticker)
-}
-
-func handleHealthCheck(w http.ResponseWriter, r *http.Request) {
-	// Let's check that the app is health every 10 seconds
-	if isHealthy {
-		json.NewEncoder(w).Encode(map[string]string{"status": "healthy"})
-	} else {
-		json.NewEncoder(w).Encode(map[string]string{"status": "unhealthy"})
-	}
-}
 func respondWithError(w http.ResponseWriter, msg string, status int) {
 	w.WriteHeader(status)
 	json.NewEncoder(w).Encode(map[string]string{"message": msg})
