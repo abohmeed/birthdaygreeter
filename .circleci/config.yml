@@ -13,8 +13,8 @@ jobs:
           command: docker build -t $IMAGE_NAME:latest .
   test:
     docker:
-      - image: circleci/redis
       - image: circleci/golang:1.12
+      - image: circleci/redis
     environment: 
       TEST_RESULTS: /tmp/test-results 
     steps:
