@@ -31,6 +31,12 @@ spec:
       containers:
       - name: app
         image: afakharany/birthdaygreeter
+        env:
+        - name: Redis password
+          valueFrom:
+            secretKeyRef:
+              name: backend-redis
+              key: redis-password
         envFrom:
         - configMapRef:
             name: appconfig

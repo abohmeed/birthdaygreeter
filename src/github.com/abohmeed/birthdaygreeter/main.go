@@ -152,7 +152,12 @@ func ping(c redis.Conn) error {
 	return nil
 }
 func set(c redis.Conn, key string, value string) error {
-	_, err := c.Do("SET", key, value)
+	_, err := c.Do("AUTH", redisPassword)
+	if err != nil {
+		log.Println("Could not authenticate to Redis", err)
+		isHealthy = false
+	}
+	_, err = c.Do("SET", key, value)
 	if err != nil {
 		return err
 	}
@@ -161,6 +166,11 @@ func set(c redis.Conn, key string, value string) error {
 
 // get executes the redis GET command
 func get(c redis.Conn, key string) (string, error) {
+	_, err := c.Do("AUTH", redisPassword)
+	if err != nil {
+		log.Println("Could not authenticate to Redis", err)
+		isHealthy = false
+	}
 	s, err := redis.String(c.Do("GET", key))
 	if err != nil {
 		return "", err

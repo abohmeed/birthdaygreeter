@@ -4,5 +4,5 @@ metadata:
   name: appconfig
 data:
   APP_PORT: "3000"
-  REDIS_HOST: redis-redis-ha-master
+  REDIS_HOST: backend-redis-master
   REDIS_PORT: "6379"
