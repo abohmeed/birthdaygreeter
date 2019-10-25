@@ -1,0 +1,22 @@
+version: "3"
+services:
+  # The Redis backend
+  redis:
+    image: "bitnami/redis:5.0"
+    environment:
+      - REDIS_PASSWORD=mypassword
+    volumes:
+      - redis_data:/data
+  app:
+    image: "afakharany/birthdaygreeter"
+    environment:
+      - REDIS_PASSWORD=mypassword
+      - REDIS_MASTER_HOST=redis
+      - REDIS_SLAVE_HOST=redis
+    ports:
+      - "80:3000"
+    depends_on: 
+      - redis
+volumes:
+  redis_data:
+    driver: local
