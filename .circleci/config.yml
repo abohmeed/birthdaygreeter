@@ -16,7 +16,8 @@ jobs:
       - image: circleci/golang:1.12
       - image: circleci/redis
     environment: 
-      TEST_RESULTS: /tmp/test-results 
+      TEST_RESULTS: /tmp/test-results
+      GOPATH: ~/project/src/github.com/abohmeed/birthdaygreeter
     steps:
       - checkout
       - run:
@@ -26,9 +27,6 @@ jobs:
           name: Install dependencies
           command: dep ensure
       - run: mkdir -p $TEST_RESULTS
-      - run:
-          name: Waiting for Redis to be ready
-          command: dockerize -wait tcp://localhost:6379 -timeout 1m
       - run:
           name: Run unit tests
           command: gotestsum --junitfile ${TEST_RESULTS}/gotestsum-report.xml
