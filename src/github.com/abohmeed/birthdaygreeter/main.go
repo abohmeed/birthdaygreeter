@@ -16,7 +16,7 @@ var isHealthy bool = true
 
 var redisHost string
 var redisPort string
-var appPort string
+var redisPassword string
 
 const layoutISO = "2006-01-02"
 
@@ -26,15 +26,13 @@ type PostData struct {
 }
 
 func setEnv() {
-	if appPort = os.Getenv("APP_PORT"); appPort == "" {
-		appPort = "3000"
-	}
 	if redisHost = os.Getenv("REDIS_HOST"); redisHost == "" {
 		redisHost = "localhost"
 	}
 	if redisPort = os.Getenv("REDIS_PORT"); redisPort == "" {
 		redisPort = "6379"
 	}
+	redisPassword = os.Getenv("REDIS_PASSWORD")
 }
 
 func newServer() http.Handler {
@@ -53,8 +51,8 @@ func main() {
 	defer conn.Close()
 	ping(conn)
 	var router = newServer()
-	log.Println("Server starting on port", appPort)
-	log.Fatal("Application is running", http.ListenAndServe(":"+appPort, router))
+	log.Println("Server starting on port 3000")
+	log.Fatal("Application is running", http.ListenAndServe(":3000", router))
 }
 
 func handleUpdateBirthdate(w http.ResponseWriter, r *http.Request) {
@@ -134,6 +132,11 @@ func newPool() *redis.Pool {
 			c, err := redis.Dial("tcp", redisHost+":"+redisPort)
 			if err != nil {
 				log.Println("Could not reach Redis", err)
+				isHealthy = false
+			}
+			_, err = c.Do("AUTH", redisPassword)
+			if err != nil {
+				log.Println("Could not authenticate to Redis", err)
 				isHealthy = false
 			}
 			return c, err

@@ -1,8 +1,8 @@
 apiVersion: v1
 kind: ConfigMap
-metdata:
+metadata:
   name: appconfig
 data:
-  APP_PORT: 3000
-  REDIS_HOST: redis-redis-ha
-  REDIS_PORT: 6379
+  APP_PORT: "3000"
+  REDIS_HOST: redis-redis-ha-master
+  REDIS_PORT: "6379"
