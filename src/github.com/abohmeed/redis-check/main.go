@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"log"
 	"os"
 
 	"github.com/gomodule/redigo/redis"
@@ -15,6 +16,7 @@ func main() {
 	conn := pool.Get()
 	defer conn.Close()
 	if err := ping(conn); err != nil {
+		log.Println("Got", *hostPtr, *portPtr)
 		os.Exit(1)
 	} else {
 		os.Exit(0)
