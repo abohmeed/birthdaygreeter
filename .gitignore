@@ -1,3 +1,2 @@
-go/src/github.com/gomodule
-go/src/github.com/gorilla
-go/pkg/*
+src/github.com/abohmeed/birthdaygreeter/vendor
+pkg/*

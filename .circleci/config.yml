@@ -25,7 +25,7 @@ jobs:
       #     command: sleep 10
       - run:
           name: Install dependencies
-          command: cd go/src/github.com/abohmeed/birthdaygreeter && dep ensure
+          command: cd $GOPATH/src/github.com/abohmeed/birthdaygreeter && dep ensure
       - run: mkdir -p $TEST_RESULTS
       - run:
           name: Run unit tests
