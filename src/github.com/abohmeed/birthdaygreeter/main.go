@@ -114,10 +114,14 @@ func handleQueryBirthdate(w http.ResponseWriter, r *http.Request) {
 }
 
 func healthCheck(w http.ResponseWriter, r *http.Request) {
-	if isHealthy {
-		json.NewEncoder(w).Encode(map[string]string{"status":"healthy"})
-	} else {
-		json.NewEncoder(w).Encode(map[string]string{"status":"unhealthy"})
+	// Let's check that the app is health every 10 seconds
+	for {
+		if isHealthy {
+			json.NewEncoder(w).Encode(map[string]string{"status": "healthy"})
+		} else {
+			json.NewEncoder(w).Encode(map[string]string{"status": "unhealthy"})
+		}
+		time.Sleep(10 * time.Second * 10)
 	}
 }
 func respondWithError(w http.ResponseWriter, msg string, status int) {
@@ -201,8 +205,8 @@ func getTimeTillBirthdate(t string) int16 {
 }
 
 func commonMiddleware(next http.Handler) http.Handler {
-    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        w.Header().Add("Content-Type", "application/json")
-        next.ServeHTTP(w, r)
-    })
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "application/json")
+		next.ServeHTTP(w, r)
+	})
 }
