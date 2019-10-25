@@ -7,16 +7,15 @@ import (
 	"github.com/gomodule/redigo/redis"
 )
 
+var host = "127.0.0.1"
+var port = "6379"
+var password = ""
+
 func main() {
-	host := os.Getenv("REDIS_MASTER_HOST")
-	port := os.Getenv("REDIS_PORT")
-	if host == "" {
-		host = "127.0.0.1"
-	}
-	if port == "" {
-		port = "6379"
-	}
-	pool := newPool(host, port)
+	host = os.Getenv("REDIS_MASTER_HOST")
+	port = os.Getenv("REDIS_PORT")
+	password = os.Getenv("REDIS_PASSWORD")
+	pool := newPool()
 	conn := pool.Get()
 	defer conn.Close()
 	if err := ping(conn); err != nil {
@@ -26,7 +25,7 @@ func main() {
 		os.Exit(0)
 	}
 }
-func newPool(host string, port string) *redis.Pool {
+func newPool() *redis.Pool {
 	return &redis.Pool{
 		// Maximum number of idle connections in the pool.
 		MaxIdle: 80,
@@ -34,6 +33,13 @@ func newPool(host string, port string) *redis.Pool {
 		MaxActive: 12000,
 		Dial: func() (redis.Conn, error) {
 			c, err := redis.Dial("tcp", host+":"+port)
+			if err != nil {
+				log.Println("Could not reach Redis", err)
+			}
+			_, err = c.Do("AUTH", password)
+			if err != nil {
+				log.Println("Could not authenticate to Redis", err)
+			}
 			return c, err
 		},
 	}

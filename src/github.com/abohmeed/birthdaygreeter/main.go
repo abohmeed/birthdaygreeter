@@ -12,8 +12,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var isHealthy = false
-
 var redisHostWrite string
 var redisHostRead string
 var redisPort string
@@ -130,30 +128,19 @@ func newPool(write bool) *redis.Pool {
 			c, err := redis.Dial("tcp", redisHost+":"+redisPort)
 			if err != nil {
 				log.Println("Could not reach Redis", err)
-				isHealthy = false
 			}
 			_, err = c.Do("AUTH", redisPassword)
 			if err != nil {
 				log.Println("Could not authenticate to Redis", err)
-				isHealthy = false
 			}
 			return c, err
 		},
 	}
 }
-
-func ping(c redis.Conn) error {
-	_, err := redis.String(c.Do("PING"))
-	if err != nil {
-		return err
-	}
-	return nil
-}
 func set(c redis.Conn, key string, value string) error {
 	_, err := c.Do("AUTH", redisPassword)
 	if err != nil {
 		log.Println("Could not authenticate to Redis", err)
-		isHealthy = false
 	}
 	_, err = c.Do("SET", key, value)
 	if err != nil {
@@ -167,7 +154,6 @@ func get(c redis.Conn, key string) (string, error) {
 	_, err := c.Do("AUTH", redisPassword)
 	if err != nil {
 		log.Println("Could not authenticate to Redis", err)
-		isHealthy = false
 	}
 	s, err := redis.String(c.Do("GET", key))
 	if err != nil {
