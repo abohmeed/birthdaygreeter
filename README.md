@@ -79,7 +79,7 @@ This procedure was tested on GCP cluster, but it should work on other cloud prov
 ```bash
 kubectl create serviceaccount --namespace kube-system tiller
 kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
-helm --service-account tiller
+helm init --service-account tiller
 ```
 
 This will create the necessary service account and cluster role binding for Tiller to be able to deploy the stack components.
