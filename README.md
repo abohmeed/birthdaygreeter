@@ -40,57 +40,6 @@ Kubernetes is the indudtry leader when it comes to container orchestration. It i
 ![diagram](./diagram.png)
 
 # Installation
-
-## Running the application natively
-
-You can build and run the application without using containers. 
-
-### Installing the dependencies:
-
-Golang must be installed on your machine first. You can build the app as follows:
-
-```bash
-cd src/github.com/abohmeed/birthdaygreeter
-go get github.com/gomodule/redigo/redis
-go get github.com/gorilla/mux
-```
-
-#### Building for Windows
-
-```bash
-env GOOS=windows GOARCH=amd64 go build package-import-path -o app
-```
-
-#### Building for Linux
-
-```bash
-env GOOS=linux GOARCH=amd64 go build package-import-path -o app
-```
-
-#### Building for macOS
-
-```bash
-env GOOS=darwin GOARCH=amd64 go build package-import-path -o app
-```
-
-#### Statically building the application
-
-If you want to statitcally build the application for Linux, you should use the following command:
-
-```bash
-CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o app
-```
-
-The above command is the one I used to build the application so that I can use the resulting binary in a `scratch` Docker imaeg that contains no libraries.
-
-### Installing Redis
-
-The application expects to find a Redis server running on `localhost:6379`. However, you **must** set a password for the Redis server and export it as an environment variable as follows:
-
-```
-export REDIS_PASSWORD=[password]
-```
-
 ## Building the Dockerfile
 
 There is an already build application image named `afakharany/birthdaygreeter`. But you can build your own image as follows:
@@ -99,6 +48,8 @@ There is an already build application image named `afakharany/birthdaygreeter`. 
 docker build -t username/image_name .
 docker push username/image_name
 ```
+
+The Dockerfile uses multi-stage building to ensure that the resulting image size is as small as possible (it was about 14 MB). We use a development image containing the necessary tools for building the binary, then a `scratch` image to place the executable in. Notice that we had to statically build the Go file so that it does not need dependencies and can run in standalone mode on the scratch image.
 
 ## Running the application on a single node
 
@@ -241,3 +192,13 @@ In this lab I'm using CircleCI as the CI/CD platform. I created a `main_test.go`
 * Handling invalid JSON input
 
 As soon as the code is committed to GitHub, CircleCl runs the tests on the code using `go test`. If all the tests pass, a Docker image is build and pushed to Docker Registry. The image is tagged `latest` as well as an incremental version number. We can then change the deployment image to use the new one. The Deployment uses rolling updated by default so the image will get changed with no downtime for the user.
+
+# Production-grade recommendations
+
+1. I didn't use SSL to make things simple. We should implement SSL at least on the frontend.
+2. I used NodePort as the service type. We should use a Load Balancer or an Ingress controller.
+3. The Redis password is stored in a Secret and retreived through an environment variable. Secrets are not secure enough for production as they are stored in base64 format (not encrypted). We should use an additonal component like HashiCorp Vault for encrypting and storing passwords in conjunction with Secrets.
+4. We are using local laptops as clients for deploying the cluster. A better solution would be to dedicate a machine as a client. This machine should have all the required tools like kubectl, helm, docker, etc. We can use Ansible for configuring this client machine. 
+5. If we are deploying to a single machine using docker-compose, we should store the Redis password in an external `.env` file. The file can be then encrypted using a tool like Ansible Vault and decrypted only during execution. 
+6. If we are expecting very high traffic volumes, we can place an extra caching layer and reverse proxying using Nginx in front of the API.
+

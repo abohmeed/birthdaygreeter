@@ -1,7 +1,7 @@
 replicaCount: 2
 
 redis_chart:
-  name: bg-redis
+  name: backend
   port: 6379
 
 container:
