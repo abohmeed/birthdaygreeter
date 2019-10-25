@@ -15,17 +15,21 @@ jobs:
     docker:
       - image: circleci/golang:1.12
       - image: circleci/redis
+    
     environment: 
       TEST_RESULTS: /tmp/test-results
-      GOPATH: ~/project
+      GO111MODULE: "on"
+      working_directory: /go/src/github.com/abohmeed/birthdaygreeter
     steps:
       - checkout
       # - run:
       #     name: Wait for Redis to start
       #     command: sleep 10
       - run:
-          name: Install dependencies
-          command: cd $GOPATH/src/github.com/abohmeed/birthdaygreeter && dep ensure
+          name: get dependancies
+          command: |
+            env
+            go get -v -t -d ./...
       - run: mkdir -p $TEST_RESULTS
       - run:
           name: Run unit tests
