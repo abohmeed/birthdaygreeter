@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 jobs:
   build:
     environment:
@@ -17,15 +17,15 @@ jobs:
       - image: circleci/redis
     environment: 
       TEST_RESULTS: /tmp/test-results
-      GOPATH: ~/project/src/github.com/abohmeed/birthdaygreeter
+      GOPATH: ~/project
     steps:
       - checkout
-      - run:
-          name: Wait for Redis to start
-          command: sleep 10
+      # - run:
+      #     name: Wait for Redis to start
+      #     command: sleep 10
       - run:
           name: Install dependencies
-          command: dep ensure
+          command: echo $GOPATH && cd src/github.com/abohmeed/birthdaygreeter && dep ensure
       - run: mkdir -p $TEST_RESULTS
       - run:
           name: Run unit tests
