@@ -11,6 +11,11 @@ jobs:
       - run:
           name: Build Docker image
           command: docker build -t $IMAGE_NAME:latest .
+      - run:
+          name: Publish Docker Image to Docker Hub
+          command: |
+            echo "$DOCKER_PASSWORD" | docker login --username $DOCKER_USERNAME --password-stdin
+            docker push $IMAGE_NAME:latest
   test:
     docker:
       - image: circleci/golang:1.12
@@ -22,9 +27,6 @@ jobs:
       working_directory: /go/src/github.com/abohmeed/birthdaygreeter
     steps:
       - checkout
-      # - run:
-      #     name: Wait for Redis to start
-      #     command: sleep 10
       - run:
           name: get dependancies
           command: |
@@ -35,19 +37,6 @@ jobs:
           name: Run unit tests
           command: gotestsum --junitfile ${TEST_RESULTS}/gotestsum-report.xml
 
-      
-  publish-latest:
-    environment:
-      IMAGE_NAME: afakharany/birthdaygreeter
-    docker:
-      - image: circleci/buildpack-deps:stretch
-    steps:
-      - setup_remote_docker
-      - run:
-          name: Publish Docker Image to Docker Hub
-          command: |
-            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-            docker push $IMAGE_NAME:latest
 workflows:
   version: 2
   build-master:
@@ -57,16 +46,9 @@ workflows:
             branches:
               only: master
       - build:
+          context: DockerHub
           filters:
             branches:
               only: master
           requires:
             - test
-
-      - publish-latest:
-              requires:
-                - build
-                - test
-              filters:
-                branches:
-                  only: master
