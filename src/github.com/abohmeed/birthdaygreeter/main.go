@@ -114,9 +114,9 @@ func handleQueryBirthdate(w http.ResponseWriter, r *http.Request) {
 
 func healthCheck(w http.ResponseWriter, r *http.Request) {
 	if isHealthy {
-		json.NewEncoder(w).Encode("OK")
+		json.NewEncoder(w).Encode(map[string]string{"status":"healthy"})
 	} else {
-		json.NewEncoder(w).Encode("Application failed")
+		json.NewEncoder(w).Encode(map[string]string{"status":"unhealthy"})
 	}
 }
 func respondWithError(w http.ResponseWriter, msg string, status int) {
