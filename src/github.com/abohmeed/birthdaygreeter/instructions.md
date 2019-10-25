@@ -17,6 +17,6 @@ helm install stable/redis
 You must create a shared secret on the default namespace. The secret must be a file called `redis-password`. Then the chart can be installed as follows:
 
 ```bash
-helm install --name backend usePassword=true usePasswordFile=true existingSecret=redis-password-file
+helm install --name bg-redis --set password=mypassword stable/redis
 ```
 

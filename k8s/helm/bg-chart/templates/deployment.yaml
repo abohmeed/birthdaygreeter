@@ -32,7 +32,7 @@ spec:
           - name: REDIS_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: {{ .Values.redis_chart.name }}-redis
+                name: {{ .Values.redis_chart.name }}
                 key: redis-password
           envFrom:
           - configMapRef:

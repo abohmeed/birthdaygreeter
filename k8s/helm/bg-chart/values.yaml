@@ -1,7 +1,7 @@
 replicaCount: 2
 
 redis_chart:
-  name: backend
+  name: bg-redis
   port: 6379
 
 container:
@@ -19,4 +19,4 @@ fullnameOverride: ""
 service:
   type: NodePort
   port: 3000
-  nodePort: 32001
+  nodePort: 32000
