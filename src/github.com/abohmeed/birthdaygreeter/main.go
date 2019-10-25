@@ -30,7 +30,7 @@ func setEnv() {
 	if redisHostWrite = os.Getenv("REDIS_MASTER_HOST"); redisHostWrite == "" {
 		redisHostWrite = "localhost"
 	}
-	if redisHostWrite = os.Getenv("REDIS_SLAVE_HOST"); redisHostRead == "" {
+	if redisHostRead = os.Getenv("REDIS_SLAVE_HOST"); redisHostRead == "" {
 		redisHostRead = "localhost"
 	}
 	if redisPort = os.Getenv("REDIS_PORT"); redisPort == "" {
