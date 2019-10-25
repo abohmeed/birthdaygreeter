@@ -22,6 +22,9 @@ jobs:
       - run:
           name: Wait for Redis to start
           command: sleep 10
+      - run:
+          name: Install dependencies
+          command: dep ensure
       - run: mkdir -p $TEST_RESULTS
       - run:
           name: Waiting for Redis to be ready
@@ -47,14 +50,17 @@ workflows:
   version: 2
   build-master:
     jobs:
-      - build:
-          filters:
-            branches:
-              only: master
       - test:
           filters:
             branches:
               only: master
+      - build:
+          filters:
+            branches:
+              only: master
+          requires:
+            - test
+
       - publish-latest:
               requires:
                 - build
