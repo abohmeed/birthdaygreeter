@@ -31,8 +31,8 @@ func newServer() http.Handler {
 
 func main() {
 	var router = newServer()
-	log.Println("Server starting on port 3000")
-	log.Fatal("Application is running", http.ListenAndServe(":3000", router))
+	log.Println("Server starting on port 8080")
+	log.Fatal("Application is running", http.ListenAndServe(":8080", router))
 }
 
 func handlePostBirthdate(w http.ResponseWriter, r *http.Request) {
